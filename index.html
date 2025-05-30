@@ -1,0 +1,290 @@
+
+<!DOCTYPE html>
+
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Control Financiero Personal</title>
+<style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+      overflow: hidden;
+    }
+    .header {
+      background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+      color: white;
+      padding: 25px;
+      text-align: center;
+    }
+    .saldo-section {
+      background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+      color: white;
+      padding: 20px;
+      text-align: center;
+      margin: 20px;
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    .saldo-disponible {
+      font-size: 2.5rem;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+    .saldo-details {
+      display: flex;
+      justify-content: space-around;
+      margin-top: 15px;
+    }
+    .saldo-item {
+      text-align: center;
+    }
+    .input-section {
+      display: flex;
+      gap: 20px;
+      padding: 20px;
+      background: #f8f9fa;
+      margin: 20px;
+      border-radius: 10px;
+      flex-wrap: wrap;
+    }
+    .input-group {
+      flex: 1;
+    }
+    .form-row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    input, select {
+      padding: 10px;
+      border: 2px solid #ddd;
+      border-radius: 5px;
+      font-size: 14px;
+    }
+    .fecha-input { width: 130px; }
+    .concepto-input { flex: 1; min-width: 200px; }
+    .monto-input { width: 120px; }
+    .categoria-select { width: 150px; }
+    .btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: bold;
+    }
+    .btn-ingreso { background: #27ae60; color: white; }
+    .btn-egreso { background: #e74c3c; color: white; }
+    .movimientos-section {
+      padding: 20px;
+    }
+    .tabla-container {
+      max-height: 400px;
+      overflow-y: auto;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+    }
+    th {
+      background: #34495e;
+      color: white;
+      padding: 12px;
+      text-align: left;
+      position: sticky;
+      top: 0;
+    }
+    td {
+      padding: 10px 12px;
+      border-bottom: 1px solid #eee;
+    }
+    tr:hover {
+      background: #f8f9fa;
+    }
+    .ingreso { color: #27ae60; font-weight: bold; }
+    .egreso { color: #e74c3c; font-weight: bold; }
+    .btn-eliminar {
+      background: #e74c3c;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 3px;
+      cursor: pointer;
+      font-size: 12px;
+    }
+    @media (max-width: 900px) {
+      .input-section {
+        flex-direction: column;
+      }
+      .form-row {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      input, select, .btn {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+<div class="header">
+<h1>💰 Control Financiero Personal</h1>
+<p>Gestioná tus ingresos y egresos fácilmente</p>
+</div>
+<div class="saldo-section">
+<div class="saldo-disponible" id="saldoDisponible">$0</div>
+<p>Saldo Disponible</p>
+<div class="saldo-details">
+<div class="saldo-item"><h3>Ingresos</h3><span id="totalIngresos">$0</span></div>
+<div class="saldo-item"><h3>Egresos</h3><span id="totalEgresos">$0</span></div>
+<div class="saldo-item"><h3>Movimientos</h3><span id="totalMovimientos">0</span></div>
+</div>
+</div>
+<div class="input-section"><div class="input-group">
+<h3>➖ Egreso</h3>
+<div class="form-row">
+<input class="fecha-input" id="fechaEgreso" type="date"/>
+<input class="concepto-input" id="conceptoEgreso" placeholder="Concepto" type="text"/>
+<input class="monto-input" id="montoEgreso" placeholder="Monto" type="number"/>
+<select class="categoria-select" id="categoriaEgreso"><option value="Camuzzi LP">Camuzzi LP</option><option value="Camuzzi Tandil">Camuzzi Tandil</option><option value="Municipal">Municipal</option><option value="Fijo">Fijo</option><option value="Variable">Variable</option></select>
+<button class="btn btn-egreso" onclick="agregarEgreso()">Agregar</button>
+</div>
+</div><div class="input-group">
+<h3>➕ Ingreso</h3>
+<div class="form-row">
+<input class="fecha-input" id="fechaIngreso" type="date"/>
+<input class="concepto-input" id="conceptoIngreso" placeholder="Concepto" type="text"/>
+<input class="monto-input" id="montoIngreso" placeholder="Monto" type="number"/>
+<select class="categoria-select" id="categoriaIngreso"><option value="IPS">IPS</option><option value="PDM">PDM</option><option value="UNLP">UNLP</option><option value="Extras">Extras</option></select>
+<button class="btn btn-ingreso" onclick="agregarIngreso()">Agregar</button>
+</div>
+</div></div>
+<div class="movimientos-section">
+<div class="tabla-container">
+<table>
+<thead>
+<tr>
+<th>Fecha</th>
+<th>Concepto</th>
+<th>Categoría</th>
+<th>Ingreso</th>
+<th>Egreso</th>
+<th>Acción</th>
+</tr>
+</thead>
+<tbody id="cuerpoTabla"></tbody>
+</table>
+</div>
+</div>
+</div>
+<script>
+    let movimientos = [];
+    let contadorId = 1;
+
+    document.getElementById('fechaIngreso').value = new Date().toISOString().split('T')[0];
+    document.getElementById('fechaEgreso').value = new Date().toISOString().split('T')[0];
+
+    function agregarIngreso() {
+      const fecha = document.getElementById('fechaIngreso').value;
+      const concepto = document.getElementById('conceptoIngreso').value;
+      const monto = parseFloat(document.getElementById('montoIngreso').value);
+      const categoria = document.getElementById('categoriaIngreso').value;
+      if (!fecha || !concepto || !monto || monto <= 0) return alert('Completa todos los campos');
+      movimientos.push({ id: contadorId++, fecha, concepto, categoria, tipo: 'ingreso', monto });
+      actualizarTodo();
+    }
+
+    function agregarEgreso() {
+      const fecha = document.getElementById('fechaEgreso').value;
+      const concepto = document.getElementById('conceptoEgreso').value;
+      const monto = parseFloat(document.getElementById('montoEgreso').value);
+      const categoria = document.getElementById('categoriaEgreso').value;
+      if (!fecha || !concepto || !monto || monto <= 0) return alert('Completa todos los campos');
+      movimientos.push({ id: contadorId++, fecha, concepto, categoria, tipo: 'egreso', monto });
+      actualizarTodo();
+    }
+
+    function eliminarMovimiento(id) {
+      movimientos = movimientos.filter(m => m.id !== id);
+      actualizarTodo();
+    }
+
+    function actualizarTodo() {
+      guardarEnLocalStorage();
+      actualizarTabla();
+      actualizarResumen();
+    }
+
+    function actualizarTabla() {
+      const tbody = document.getElementById('cuerpoTabla');
+      tbody.innerHTML = '';
+      movimientos.slice().reverse().forEach(m => {
+        const fila = document.createElement('tr');
+        fila.innerHTML = `
+          <td>${m.fecha}</td>
+          <td>${m.concepto}</td>
+          <td>${m.categoria}</td>
+          <td>${m.tipo === 'ingreso' ? formatMoney(m.monto) : '-'}</td>
+          <td>${m.tipo === 'egreso' ? formatMoney(m.monto) : '-'}</td>
+          <td><button class="btn-eliminar" onclick="eliminarMovimiento(${m.id})">❌</button></td>
+        `;
+        tbody.appendChild(fila);
+      });
+    }
+
+    function actualizarResumen() {
+      const ingresos = movimientos.filter(m => m.tipo === 'ingreso').reduce((sum, m) => sum + m.monto, 0);
+      const egresos = movimientos.filter(m => m.tipo === 'egreso').reduce((sum, m) => sum + m.monto, 0);
+      document.getElementById('totalIngresos').textContent = formatMoney(ingresos);
+      document.getElementById('totalEgresos').textContent = formatMoney(egresos);
+      document.getElementById('saldoDisponible').textContent = formatMoney(ingresos - egresos);
+      document.getElementById('totalMovimientos').textContent = movimientos.length;
+    }
+
+    function formatMoney(value) {
+      return new Intl.NumberFormat('es-AR', {
+        style: 'currency',
+        currency: 'ARS',
+        minimumFractionDigits: 0
+      }).format(value);
+    }
+
+    function guardarEnLocalStorage() {
+      localStorage.setItem('movimientos', JSON.stringify(movimientos));
+    }
+
+    function cargarDesdeLocalStorage() {
+      const guardados = localStorage.getItem('movimientos');
+      if (guardados) {
+        movimientos = JSON.parse(guardados);
+        contadorId = movimientos.length ? Math.max(...movimientos.map(m => m.id)) + 1 : 1;
+      }
+      actualizarTodo();
+    }
+
+    cargarDesdeLocalStorage();
+  </script>
+</body>
+</html>
